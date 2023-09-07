@@ -24,4 +24,58 @@ RSpec.describe "Appointments", type: :request do
       end
     end
   end
+
+  describe "POST /create" do
+    let(:slot) { create(:slot) }
+
+    context "with valid parameters" do
+      let(:params) { { appointment: { slot_id: slot.id } } }
+
+      context "when slot is available" do
+        it "creates a new Appointment" do
+          expect do
+            post appointments_path, params: params, headers: auth_header, as: :json
+          end.to change(Appointment, :count).by(1)
+        end
+
+        it "renders a JSON response with the new appointment" do
+          post appointments_path, params: params, headers: auth_header, as: :json
+          expect(response).to have_http_status(:created)
+          expect(response.parsed_body["id"]).to eq(Appointment.last.id)
+        end
+      end
+
+      context "when slot is not available" do
+        before { create(:appointment, slot: slot) }
+
+        it "does not create a new Appointment" do
+          expect do
+            post appointments_path, params: params, headers: auth_header, as: :json
+          end.not_to change(Appointment, :count)
+        end
+
+        it "renders a JSON response with errors for the new appointment" do
+          post appointments_path, params: params, headers: auth_header, as: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.parsed_body["errors"]).to eq(["Slot has already been taken"])
+        end
+      end
+    end
+
+    context "with invalid parameters" do
+      let(:params) { { appointment: { slot_id: nil } } }
+
+      it "does not create a new Appointment" do
+        expect do
+          post appointments_path, params: params, headers: auth_header, as: :json
+        end.not_to change(Appointment, :count)
+      end
+
+      it "renders a JSON response with errors for the new appointment" do
+        post appointments_path, params: params, headers: auth_header, as: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body["errors"]).to eq(["Slot must exist"])
+      end
+    end
+  end
 end

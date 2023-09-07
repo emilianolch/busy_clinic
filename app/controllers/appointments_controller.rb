@@ -8,4 +8,21 @@ class AppointmentsController < ApplicationController
       .includes(:slot, :doctor)
       .sort_by(&:time)
   end
+
+  def create
+    @appointment = current_user.appointments.build(appointment_params)
+
+    if @appointment.save
+      render @appointment, status: :created
+    else
+      render json: { errors: @appointment.errors.full_messages },
+        status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def appointment_params
+    params.require(:appointment).permit(:slot_id)
+  end
 end
