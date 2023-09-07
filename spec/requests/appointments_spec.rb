@@ -78,4 +78,53 @@ RSpec.describe "Appointments", type: :request do
       end
     end
   end
+
+  describe "PATCH /update" do
+    let(:appointment) { create(:appointment, patient: patient) }
+    let(:slot) { create(:slot) }
+
+    context "with valid parameters" do
+      let(:params) { { appointment: { slot_id: slot.id } } }
+
+      context "when new slot is available" do
+        it "updates the requested appointment" do
+          patch appointment_path(appointment), params: params, headers: auth_header, as: :json
+          appointment.reload
+          expect(appointment.slot).to eq(slot)
+        end
+
+        it "renders a JSON response with the appointment" do
+          patch appointment_path(appointment), params: params, headers: auth_header, as: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body["id"]).to eq(appointment.id)
+        end
+      end
+
+      context "when new slot is not available" do
+        before { create(:appointment, slot: slot) }
+
+        it "does not update the requested appointment" do
+          patch appointment_path(appointment), params: params, headers: auth_header, as: :json
+          appointment.reload
+          expect(appointment.slot).not_to eq(slot)
+        end
+
+        it "renders a JSON response with errors for the appointment" do
+          patch appointment_path(appointment), params: params, headers: auth_header, as: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.parsed_body["errors"]).to eq(["Slot has already been taken"])
+        end
+      end
+    end
+
+    context "with invalid parameters" do
+      let(:params) { { appointment: { slot_id: nil } } }
+
+      it "renders a JSON response with errors for the appointment" do
+        patch appointment_path(appointment), params: params, headers: auth_header, as: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body["errors"]).to eq(["Slot must exist"])
+      end
+    end
+  end
 end
