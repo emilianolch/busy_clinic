@@ -4,6 +4,6 @@ FactoryBot.define do
   factory :slot do
     doctor
 
-    time { Faker::Time.between(from: Time.current, to: Time.current + 10.days) } # rubocop:disable Rails/DurationArithmetic
+    sequence(:time) { |n| Time.current + (n * 30).minutes }
   end
 end

@@ -11,4 +11,8 @@ class ApplicationController < ActionController::API
     @current_user = User.find_by(token: request.headers["Authorization"])
     render json: { error: "Not Authorized" }, status: :unauthorized unless @current_user
   end
+
+  def require_patient!
+    render json: { error: "Not Authorized" }, status: :unauthorized unless @current_user.is_a?(Patient)
+  end
 end

@@ -6,4 +6,6 @@ class Appointment < ApplicationRecord
   has_one :doctor, through: :slot
 
   validates :slot_id, uniqueness: true
+
+  delegate :time, to: :slot
 end
