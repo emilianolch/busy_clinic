@@ -56,7 +56,6 @@ end
 
 group :test do
   gem "shoulda-matchers"
-  gem 'rspec-json_expectations'
 end
 
 gem "jbuilder", "~> 2.11"

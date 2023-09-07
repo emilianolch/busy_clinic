@@ -31,8 +31,10 @@ RSpec.describe "Doctors", type: :request do
     it "renders a json of the doctor with their name, id and available slots" do
       get doctor_path(doctor), as: :json, headers: auth_header
 
-      expect(response.body).to include_json(id: doctor.id, name: doctor.name)
-      expect(response.body).to include_json(available_slots: slots.map { |slot| { id: slot.id } })
+      expect(response.parsed_body["id"]).to eq(doctor.id)
+      expect(response.parsed_body["name"]).to eq(doctor.name)
+      expect(response.parsed_body["available_slots"].map { |slot| slot["id"] })
+        .to eq(slots.map(&:id))
     end
   end
 end
