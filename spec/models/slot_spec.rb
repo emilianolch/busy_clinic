@@ -3,16 +3,22 @@
 require "rails_helper"
 
 RSpec.describe Slot, type: :model do
+  subject { build(:slot) }
+
   describe "associations" do
     it { is_expected.to belong_to(:doctor) }
     it { is_expected.to have_one(:appointment).dependent(:destroy) }
   end
 
   describe "validations" do
-    subject { build(:slot) }
-
     it { is_expected.to validate_presence_of(:time) }
     it { is_expected.to validate_uniqueness_of(:time).scoped_to(:doctor_id) }
+
+    it "avoids overlapping slots" do
+      slot = create(:slot)
+      expect(build(:slot, doctor: slot.doctor, time: slot.time - 29.minutes)).not_to be_valid
+      expect(build(:slot, doctor: slot.doctor, time: slot.time + 29.minutes)).not_to be_valid
+    end
   end
 
   describe "scopes" do
