@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_09_07_181722) do
+ActiveRecord::Schema[7.0].define(version: 2023_09_07_183541) do
+  create_table "slots", force: :cascade do |t|
+    t.integer "doctor_id", null: false
+    t.datetime "time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["doctor_id", "time"], name: "index_slots_on_doctor_id_and_time", unique: true
+    t.index ["doctor_id"], name: "index_slots_on_doctor_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "user_type"
     t.string "name"
@@ -20,4 +29,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_07_181722) do
     t.index ["token"], name: "index_users_on_token", unique: true
   end
 
+  add_foreign_key "slots", "users", column: "doctor_id"
 end
