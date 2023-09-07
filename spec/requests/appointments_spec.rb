@@ -115,6 +115,22 @@ RSpec.describe "Appointments", type: :request do
           expect(response.parsed_body["errors"]).to eq(["Slot has already been taken"])
         end
       end
+
+      context "when appointment does not belong to patient" do
+        let(:appointment) { create(:appointment) }
+
+        it "does not update the requested appointment" do
+          patch appointment_path(appointment), params: params, headers: auth_header, as: :json
+          appointment.reload
+          expect(appointment.slot).not_to eq(slot)
+        end
+
+        it "renders a JSON response with errors for the appointment" do
+          patch appointment_path(appointment), params: params, headers: auth_header, as: :json
+          expect(response).to have_http_status(:not_found)
+          expect(response.parsed_body["errors"]).to eq(["Appointment not found"])
+        end
+      end
     end
 
     context "with invalid parameters" do
@@ -124,6 +140,39 @@ RSpec.describe "Appointments", type: :request do
         patch appointment_path(appointment), params: params, headers: auth_header, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.parsed_body["errors"]).to eq(["Slot must exist"])
+      end
+    end
+  end
+
+  describe "DELETE /destroy" do
+    context "when appointment belongs to patient" do
+      let!(:appointment) { create(:appointment, patient: patient) }
+
+      it "destroys the requested appointment" do
+        expect do
+          delete appointment_path(appointment), headers: auth_header, as: :json
+        end.to change(Appointment, :count).by(-1)
+      end
+
+      it "renders a no content" do
+        delete appointment_path(appointment), headers: auth_header, as: :json
+        expect(response).to have_http_status(:no_content)
+      end
+    end
+
+    context "when appointment does not belong to patient" do
+      let!(:appointment) { create(:appointment) }
+
+      it "does not destroy the requested appointment" do
+        expect do
+          delete appointment_path(appointment), headers: auth_header, as: :json
+        end.not_to change(Appointment, :count)
+      end
+
+      it "renders a JSON response with errors for the appointment" do
+        delete appointment_path(appointment), headers: auth_header, as: :json
+        expect(response).to have_http_status(:not_found)
+        expect(response.parsed_body["errors"]).to eq(["Appointment not found"])
       end
     end
   end

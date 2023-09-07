@@ -2,6 +2,7 @@
 
 class AppointmentsController < ApplicationController
   before_action :require_patient!
+  before_action :set_appointment, only: [:update, :destroy]
 
   def index
     @appointments = current_user.appointments
@@ -21,8 +22,6 @@ class AppointmentsController < ApplicationController
   end
 
   def update
-    @appointment = current_user.appointments.find(params[:id])
-
     if @appointment.update(appointment_params)
       render @appointment
     else
@@ -31,7 +30,19 @@ class AppointmentsController < ApplicationController
     end
   end
 
+  def destroy
+    @appointment.destroy
+
+    head :no_content
+  end
+
   private
+
+  def set_appointment
+    @appointment = current_user.appointments.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { errors: ["Appointment not found"] }, status: :not_found
+  end
 
   def appointment_params
     params.require(:appointment).permit(:slot_id)
