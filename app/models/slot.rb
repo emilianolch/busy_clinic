@@ -5,4 +5,6 @@ class Slot < ApplicationRecord
   has_one :appointment, dependent: :destroy
 
   validates :time, presence: true, uniqueness: { scope: :doctor_id }
+
+  scope :available, -> { where.missing(:appointment) }
 end
