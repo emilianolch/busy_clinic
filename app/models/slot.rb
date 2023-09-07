@@ -7,7 +7,8 @@ class Slot < ApplicationRecord
   validates :time, presence: true, uniqueness: { scope: :doctor_id }
   validate :non_overlapping_validation
 
-  scope :available, -> { where.missing(:appointment).where("time > ?", Time.current) }
+  scope :available,
+    -> { where.missing(:appointment).where("time > ?", Time.current).order(:time) }
 
   private
 
