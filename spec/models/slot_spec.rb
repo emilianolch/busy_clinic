@@ -16,8 +16,8 @@ RSpec.describe Slot, type: :model do
 
     it "avoids overlapping slots" do
       slot = create(:slot)
-      expect(build(:slot, doctor: slot.doctor, time: slot.time - 29.minutes)).not_to be_valid
-      expect(build(:slot, doctor: slot.doctor, time: slot.time + 29.minutes)).not_to be_valid
+      expect(build(:slot, doctor: slot.doctor, time: slot.time - Slot::INTERVAL + 1.minute)).not_to be_valid
+      expect(build(:slot, doctor: slot.doctor, time: slot.time + Slot::INTERVAL - 1.minute)).not_to be_valid
     end
   end
 

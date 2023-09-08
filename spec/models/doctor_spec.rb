@@ -12,4 +12,27 @@ RSpec.describe Doctor, type: :model do
   describe "validations" do
     it { is_expected.to validate_presence_of(:name) }
   end
+
+  describe "#generate_slots" do
+    let(:doctor) { create(:doctor) }
+
+    it "creates slots for the given time range" do
+      expect do
+        doctor.generate_slots(Time.current, 1.day.from_now)
+      end.to change(doctor.slots, :count).by(48)
+    end
+
+    it "returns the created slots" do
+      expect(
+        doctor.generate_slots(Time.current, 1.day.from_now),
+      ).to all(be_a(Slot))
+    end
+
+    it "does not create slots that already exist" do
+      create(:slot, doctor: doctor, time: Time.current)
+      expect do
+        doctor.generate_slots(Time.current, 1.day.from_now)
+      end.to change(Slot, :count).by(47)
+    end
+  end
 end
