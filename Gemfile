@@ -52,6 +52,8 @@ group :development do
   gem "rubocop-rails", require: false
   gem "rubocop-rspec", require: false
   gem "erb_lint", require: false
+  gem "annotate"
+  gem "rails-erd"
 end
 
 group :test do
