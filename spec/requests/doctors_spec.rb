@@ -37,4 +37,31 @@ RSpec.describe "Doctors", type: :request do
         .to eq(slots.map(&:id))
     end
   end
+
+  describe "GET /working_hours" do
+    let(:doctor) { create(:doctor) }
+    let!(:slots) { create_list(:slot, 3, doctor: doctor) }
+
+    context "when date is provided" do
+      it "renders a successful response" do
+        get working_hours_doctor_path(doctor, date: Date.current), as: :json, headers: auth_header
+        expect(response).to be_successful
+      end
+
+      it "renders a json of the doctor with their name, id and working hours for a given date" do
+        get working_hours_doctor_path(doctor, date: Date.current), as: :json, headers: auth_header
+
+        expect(response.parsed_body["id"]).to eq(doctor.id)
+        expect(response.parsed_body["name"]).to eq(doctor.name)
+        expect(response.parsed_body["working_hours"].size).to eq(slots.count { |s| s.time.to_date == Date.current })
+      end
+    end
+
+    context "when date is not provided" do
+      it "renders an error response" do
+        get working_hours_doctor_path(doctor), as: :json, headers: auth_header
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+  end
 end

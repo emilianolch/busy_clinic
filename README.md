@@ -85,6 +85,37 @@ Example response for `/doctors/1`
 }
 ```
 
+### GET /doctors/:id/working_hours
+
+Returns a list of the doctor's slots for a given date.
+
+Example response for `/doctors/1/working_hours?date=2023-09-09`
+
+```
+{
+  "id": 1,
+  "name": "Tomeka Dicki",
+  "working_hours": [
+    {
+      "id": 1,
+      "time": "2023-09-09T17:04:51.000Z"
+    },
+    {
+      "id": 2,
+      "time": "2023-09-09T17:34:51.000Z"
+    },
+    {
+      "id": 3,
+      "time": "2023-09-09T18:04:51.000Z"
+    },
+    {
+      "id": 4,
+      "time": "2023-09-09T18:34:51.000Z"
+    }
+  ]
+}
+```
+
 ### POST /appointments
 
 Books an appointment for a given time slot. The patient is assumed to be the one with the token passed in the `Authorization` header.
@@ -124,7 +155,8 @@ In case of error, returns a 422 status code with the following body:
 
 ### PATCH /appointments/:id
 
-Updates an appointment. The patient is assumed to be the one with the token passed in the `Authorization` header.
+Modifies an appointment's slot_id. The patient is assumed to be the one with the token passed in the `Authorization` header.
+The new slot must be available, otherwise a 422 status code is returned.
 
 Example request: `/appointments/1`
 
