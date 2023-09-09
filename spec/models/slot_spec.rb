@@ -31,7 +31,6 @@ RSpec.describe Slot, type: :model do
 
   describe "validations" do
     it { is_expected.to validate_presence_of(:time) }
-    it { is_expected.to validate_uniqueness_of(:time).scoped_to(:doctor_id) }
 
     it "avoids overlapping slots" do
       slot = create(:slot)

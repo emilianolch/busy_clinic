@@ -1,14 +1,10 @@
 # Busy Clinic
 
-This is a simple Rails API to manage doctor availability and patient appointments.
-
-The solution is based on the following assumptions:
-
-- The authentication process is out of the scope of this solution. The API assumes that the patient is already authenticated and that the token is passed in the `Authorization` header.
-- The schedule of a doctor is a list of time slots, each of which is 30 minutes long.
+This is a simple Rails API to manage doctor availabilities and patient appointments.
 
 ## Notes
 
+- The authentication process is out of the scope of this solution. The API assumes that the user is already authenticated and that the token is passed in the `Authorization` header.
 - To keep it simple, the database engine is SQLite. In a real world scenario, I would use PostgreSQL.
 - The JSON responses are generated using jbuilder. In a real world scenario, where performance is an issue, I would use jsonapi-serializer.
 - The code is linted using Rubocop with a set of rules that I use in my daily work.
@@ -29,11 +25,43 @@ The database is seeded with two doctors with a 6 hour schedule each, and a patie
 The patient's token will be printed to the console. Use this token as the `Authorization` header for all requests.
 
 Run the tests:
+
 `bundle exec rspec`
 
-## Running
+Start the server:
 
 `rails s`
+
+## Models
+
+### User
+
+The user model is used to represent both doctors and patients, using single table inheritance. It has a `token` attribute that is used for authentication.
+
+### Doctor
+
+The doctor model has a `has_many` relationship with the `Slot` model. The schedule of a doctor is composed of a list of fixed-length time slots. The `#generate_slots` method is provided to generate the slots for a given time range.
+
+A doctor has a `has_many` relationship with the `Appointment` model through the `Slot` model, which is used to retrieve the list of appointments for a doctor.
+It also has a `has_many` relationship with the `Patient` model through the `Appointment` model.
+
+### Slot
+
+This model represents a 30 minute time slot. It has a `time ` attribute that is used to store the time of the slot. It has a `belongs_to` relationship with the `Doctor` model and a `has_one` relationship with the `Appointment` model.
+
+A validation is provided to ensure that a doctor can't have two slots at the same time.
+
+A given slot is considered available if it doesn't have an appointment associated with it, and if it's in the future.
+
+### Appointment
+
+This model represents an appointment done by a patient. It has a `belongs_to` relationship with the `Slot` model and a `belongs_to` relationship with the `Patient` model.
+
+A unique validation on slot_id is provided to ensure that a slot can't have two appointments associated with it.
+
+### Patient
+
+This model has a `has_many` relationship with the `Appointment` model and a `has_many` relationship with the `Doctor` model through the `Appointment` model.
 
 ## API
 
@@ -203,5 +231,3 @@ Example response:
 ### DELETE /appointments/:id
 
 Deletes an appointment. The patient is assumed to be the one with the token passed in the `Authorization` header.
-
-Describe the models and their relationships.
