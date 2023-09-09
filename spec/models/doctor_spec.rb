@@ -29,7 +29,7 @@ RSpec.describe Doctor, type: :model do
   end
 
   describe "#generate_slots" do
-    let(:doctor) { create(:doctor) }
+    subject(:doctor) { create(:doctor) }
 
     it "creates slots for the given time range" do
       expect do

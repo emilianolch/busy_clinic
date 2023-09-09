@@ -16,6 +16,8 @@ RSpec.describe "Appointments", type: :request do
 
     it "renders a json list of appointments with their id, time, doctor name and doctor id" do
       get appointments_path, as: :json, headers: auth_header
+      expect(response.parsed_body.size).to eq(appointments.size)
+
       response.parsed_body.each_with_index do |appointment, index|
         expect(appointment["id"]).to eq(appointments[index].id)
         expect(Time.zone.parse(appointment["time"]).round).to eq(appointments[index].time.round)
