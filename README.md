@@ -8,7 +8,7 @@ This is a simple Rails API to manage doctor availabilities and patient appointme
 - To keep it simple, the database engine is SQLite. In a real world scenario, I would use PostgreSQL.
 - The JSON responses are generated using jbuilder. In a real world scenario, where performance is an issue, I would use jsonapi-serializer.
 - The code is linted using Rubocop with a set of rules that I use in my daily work.
-- All the code is covered by Rspec tests, following the TDD approach.
+- ~~All the code~~ _99% of the code_ is covered by Rspec tests, following the TDD approach. I forgot to test one important situation in the integration tests. Let me know if you find it 😊
 - The API is not versioned. In a real world scenario, I would wrap the API in a namespace and version it.
 
 ## Installation
