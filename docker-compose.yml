@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:alpine
+    container_name: busy_clinic_db
+    environment:
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - data:/var/lib/postgresql/data
+  app:
+    build: .
+    container_name: busy_clinic
+    environment:
+      - POSTGRES_HOST=busy_clinic_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - .:/app
+      - bundle:/usr/local/bundle
+    ports:
+      - 3000:3000
+volumes:
+  data:
+  bundle:
