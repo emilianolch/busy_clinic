@@ -153,7 +153,7 @@ Example request:
 ```
 {
   "appointment": {
-    "time_slot_id": 3
+    "slot_id": 3
   }
 }
 ```
