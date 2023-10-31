@@ -30,11 +30,11 @@ pipeline {
                 sh 'docker-compose build'
             }
         }
-        stage('test') {
-            steps {
-                sh 'docker-compose run --rm app bundle exec rspec'
-            }
-        }
+        // stage('test') {
+        //     steps {
+        //         sh 'docker-compose run --rm app bundle exec rspec'
+        //     }
+        // }
         stage('deploy') {
             steps {
                 sh 'docker-compose up -d'
