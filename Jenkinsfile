@@ -20,25 +20,30 @@ pipeline {
             steps {
                 sh '''
                     docker --version
-                    docker-compose --version
+                    docker compose --version
                     docker info
                 '''
             }
         }
         stage('build') {
             steps {
-                sh 'docker-compose build'
+                sh 'docker compose build'
             }
         }
         // stage('test') {
         //     steps {
-        //         sh 'docker-compose run --rm app bundle exec rspec'
+        //         sh 'docker compose run --rm app bundle exec rspec'
         //     }
         // }
         stage('deploy') {
             steps {
-                sh 'docker-compose up -d'
+                sh 'docker compose up -d'
             }
+        }
+    }
+    post {
+        always {
+            sh 'docker compose down --remove-orphans'
         }
     }
 }
