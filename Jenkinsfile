@@ -17,13 +17,15 @@ pipeline {
     agent any
     stages {
         stage('verify tooling') {
-            sh '''
-                docker --version
-                docker-compose --version
-                docker info
-                curl --version
-                jq --version
-            '''
+            steps {
+                sh '''
+                    docker --version
+                    docker-compose --version
+                    docker info
+                    curl --version
+                    jq --version
+                '''
+            }
         }
     }
 }
