@@ -42,6 +42,7 @@ group :development, :test do
   gem "rspec-rails"
   gem "factory_bot_rails"
   gem "faker"
+  gem "rswag-specs"
 end
 
 group :development do
@@ -61,3 +62,6 @@ group :test do
 end
 
 gem "jbuilder", "~> 2.11"
+
+gem "rswag-api"
+gem "rswag-ui"
