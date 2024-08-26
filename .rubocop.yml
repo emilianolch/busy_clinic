@@ -31,6 +31,8 @@ Lint/MissingSuper:
     - 'app/components/**/*'
 RSpec/MultipleMemoizedHelpers:
   Max: 10
+RSpec/EmptyExampleGroup:
+  Enabled: false
 Rails/UnknownEnv:
   Environments:
     - production

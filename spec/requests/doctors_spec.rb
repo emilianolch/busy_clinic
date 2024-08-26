@@ -1,66 +1,69 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require "swagger_helper"
 
-RSpec.describe "Doctors", type: :request do
-  let(:auth_header) { { Authorization: create(:patient).token } }
+RSpec.describe "doctors" do
+  # rubocop:disable RSpec/VariableName
+  let(:Authorization) { create(:patient).token }
+  # rubocop:enable RSpec/VariableName
 
-  describe "GET /index" do
+  path "/doctors" do
     let!(:doctors) { create_list(:doctor, 3) }
 
-    it "renders a successful response" do
-      get doctors_path, as: :json, headers: auth_header
-      expect(response).to be_successful
-    end
+    parameter name: "Authorization", in: :header, type: :string, description: "Authorization"
 
-    it "renders a json list of doctors with their name and id" do
-      get doctors_path, as: :json, headers: auth_header
-      expect(response.body).to eq(doctors.to_json(only: [:id, :name]))
+    get("list doctors") do
+      response(200, "successful") do
+        run_test! do |response|
+          expect(response.body).to eq(doctors.to_json(only: [:id, :name]))
+        end
+      end
     end
   end
 
-  describe "GET /show" do
+  path "/doctors/{id}" do
     let(:doctor) { create(:doctor) }
+    let(:id) { doctor.id }
     let!(:slots) { create_list(:slot, 3, doctor: doctor).sort_by(&:time) }
 
-    it "renders a successful response" do
-      get doctor_path(doctor), as: :json, headers: auth_header
-      expect(response).to be_successful
-    end
+    parameter name: "Authorization", in: :header, type: :string, description: "Authorization"
+    parameter name: "id", in: :path, type: :string, description: "id"
 
-    it "renders a json of the doctor with their name, id and available slots" do
-      get doctor_path(doctor), as: :json, headers: auth_header
-
-      expect(response.parsed_body["id"]).to eq(doctor.id)
-      expect(response.parsed_body["name"]).to eq(doctor.name)
-      expect(response.parsed_body["available_slots"].map { |slot| slot["id"] })
-        .to eq(slots.map(&:id))
+    get("show doctor") do
+      response(200, "successful") do
+        run_test! do |response|
+          expect(response.parsed_body["id"]).to eq(doctor.id)
+          expect(response.parsed_body["name"]).to eq(doctor.name)
+          expect(response.parsed_body["available_slots"].pluck("id")).to eq(slots.pluck(:id))
+        end
+      end
     end
   end
 
-  describe "GET /working_hours" do
+  path "/doctors/{id}/working_hours" do
     let(:doctor) { create(:doctor) }
+    let(:id) { doctor.id }
     let!(:slots) { create_list(:slot, 3, doctor: doctor) }
 
-    context "when date is provided" do
-      it "renders a successful response" do
-        get working_hours_doctor_path(doctor, date: Date.current), as: :json, headers: auth_header
-        expect(response).to be_successful
+    parameter name: "Authorization", in: :header, type: :string, description: "Authorization"
+    parameter name: "id", in: :path, type: :string, description: "id"
+    parameter name: :date, in: :query, type: :string, description: "date"
+
+    get("working_hours doctor") do
+      response(200, "successful") do
+        let(:date) { Date.current }
+
+        run_test! do |response|
+          expect(response.parsed_body["id"]).to eq(doctor.id)
+          expect(response.parsed_body["name"]).to eq(doctor.name)
+          expect(response.parsed_body["working_hours"].size).to eq(slots.count { |s| s.time.to_date == Date.current })
+        end
       end
 
-      it "renders a json of the doctor with their name, id and working hours for a given date" do
-        get working_hours_doctor_path(doctor, date: Date.current), as: :json, headers: auth_header
+      response(400, "bad request") do
+        let(:date) { nil }
 
-        expect(response.parsed_body["id"]).to eq(doctor.id)
-        expect(response.parsed_body["name"]).to eq(doctor.name)
-        expect(response.parsed_body["working_hours"].size).to eq(slots.count { |s| s.time.to_date == Date.current })
-      end
-    end
-
-    context "when date is not provided" do
-      it "renders an error response" do
-        get working_hours_doctor_path(doctor), as: :json, headers: auth_header
-        expect(response).to have_http_status(:bad_request)
+        run_test!
       end
     end
   end

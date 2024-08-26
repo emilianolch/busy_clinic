@@ -10,9 +10,9 @@ class DoctorsController < ApplicationController
   def show; end
 
   def working_hours
-    @slots = @doctor.slots.where("DATE(time) = ?", params.fetch(:date))
-  rescue ActionController::ParameterMissing
-    render json: { error: "Date is required" }, status: :bad_request
+    @slots = @doctor.slots.where("DATE(time) = ?", Date.parse(params[:date]))
+  rescue Date::Error => e
+    render json: { error: e.message }, status: :bad_request
   end
 
   private
