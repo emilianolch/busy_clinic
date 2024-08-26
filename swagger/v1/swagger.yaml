@@ -1,0 +1,66 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/doctors":
+    parameters:
+    - name: Authorization
+      in: header
+      description: Authorization
+      schema:
+        type: string
+    get:
+      summary: list doctors
+      responses:
+        '200':
+          description: successful
+  "/doctors/{id}":
+    parameters:
+    - name: Authorization
+      in: header
+      description: Authorization
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: id
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show doctor
+      responses:
+        '200':
+          description: successful
+  "/doctors/{id}/working_hours":
+    parameters:
+    - name: Authorization
+      in: header
+      description: Authorization
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: id
+      required: true
+      schema:
+        type: string
+    - name: date
+      in: query
+      description: date
+      schema:
+        type: string
+    get:
+      summary: working_hours doctor
+      responses:
+        '200':
+          description: successful
+        '400':
+          description: bad request
+servers:
+- url: http://{defaultHost}
+  variables:
+    defaultHost:
+      default: localhost:3000
